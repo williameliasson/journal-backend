@@ -54,4 +54,11 @@ public class AuthService {
         // SecurityContextHolder.getContext().setAuthentication(authentication);
         return authentication;
     }
+
+    public User getUserByUsername(String username){
+        Optional<User> maybeUser = userRepository.findByUsername(username);
+        if (!maybeUser.isPresent()) throw new IllegalArgumentException("User not found");
+        User user = maybeUser.get();
+        return user;
+    }
 }
