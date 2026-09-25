@@ -5,6 +5,7 @@ import com.williameliasson.journal_backend.models.Mood;
 import com.williameliasson.journal_backend.repositories.MoodRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -40,6 +41,15 @@ public class MoodService {
     public List<Mood> getAllMoods(){
         return (List<Mood>) moodRepository.findAll();
     }
+
+    public Mood getMoodById(Integer id){
+        Optional<Mood> maybeMood = moodRepository.findById(id);
+        if (!maybeMood.isPresent()){
+            throw new IllegalArgumentException("Mood not found with id");
+        }
+        return maybeMood.get();
+    }
+
     //u
     //d
 }

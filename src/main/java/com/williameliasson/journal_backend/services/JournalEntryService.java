@@ -1,6 +1,8 @@
 package com.williameliasson.journal_backend.services;
 
+import com.williameliasson.journal_backend.dtos.CreateJournalEntryRequest;
 import com.williameliasson.journal_backend.models.JournalEntry;
+import com.williameliasson.journal_backend.models.Mood;
 import com.williameliasson.journal_backend.models.User;
 import com.williameliasson.journal_backend.repositories.JournalEntryRepository;
 
@@ -10,18 +12,24 @@ import org.springframework.stereotype.Service;
 
 @Service 
 public class JournalEntryService {
+    private final MoodService moodService;
     private final JournalEntryRepository journalEntryRepository;
 
-    JournalEntryService(JournalEntryRepository journalEntryRepository) {
+    JournalEntryService(JournalEntryRepository journalEntryRepository, MoodService moodService) {
         this.journalEntryRepository = journalEntryRepository;
+        this.moodService = moodService;
     }
 
-    public void createJournalEntry(){
+    public void createJournalEntry(CreateJournalEntryRequest createJournalEntryRequest, User user){    
+        // get data
+        Mood mood = moodService.getMoodById(createJournalEntryRequest.moodId());
+        
         // construct the object
         JournalEntry journalEntry = new JournalEntry();
+        journalEntry.setMood(mood);
+        journalEntry.setUser(user);
+        journalEntry.setTitle(createJournalEntryRequest.title());
         
-        // validate fields
-
         journalEntryRepository.save(journalEntry);
     }
 
@@ -29,8 +37,8 @@ public class JournalEntryService {
         return journalEntryRepository.findAllByUser(user);
     }
 
-    // remove this later! just for testing!
-    public List<JournalEntry> getAllJournalEntries(){
-        return (List<JournalEntry>) journalEntryRepository.findAll(); // har aldrig castat så förr men provar
-    }
+    
+    // public List<JournalEntry> getAllJournalEntries(){
+    //     return (List<JournalEntry>) journalEntryRepository.findAll();
+    // }
 }
