@@ -25,4 +25,8 @@ public class Mood {
 
     @Column (nullable = false, unique = true)
     private String name;
+
+    public Mood(String name){
+        this.name = name;
+    }
 }
