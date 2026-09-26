@@ -12,16 +12,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Optional;
-
 import com.williameliasson.journal_backend.dtos.RegisterRequest;
-import com.williameliasson.journal_backend.models.User;
 import com.williameliasson.journal_backend.repositories.UserRepository;
 import com.williameliasson.journal_backend.services.AuthService;
 
@@ -31,7 +26,7 @@ import tools.jackson.databind.ObjectMapper;
 @SpringBootTest
 @AutoConfigureMockMvc 
 @Testcontainers 
-class JournalBackendApplicationTests {
+class AuthIntegrationTests {
 
 	// src: https://www.youtube.com/watch?v=erp-7MCK5BU&t=1495s
 	@Container 
@@ -55,17 +50,23 @@ class JournalBackendApplicationTests {
 	void contextLoads() {
 	}
 
-	@Test
-	@Transactional 
-	void userShouldBeCreated() throws Exception{
-		// create user using repository
-		String username = "Bob";
+	// helper method to make easier to read
+	private MvcResult registerValidUser(String username) throws Exception{
 		RegisterRequest registerRequest = new RegisterRequest(username, "password", "password");
 		MvcResult mvcResult = mockMvc.perform(post("/api/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest))) 
                 .andExpect(status().isCreated())
-                .andReturn();		
+                .andReturn();
+		return mvcResult;	
+	}
+
+	@Test
+	@Transactional 
+	void userShouldBeCreatedWhenCorrectRequest() throws Exception{
+		// create user using repository
+		String username = "Bob";
+		registerValidUser(username);
 		assertTrue(userRepository.findByUsername(username).get().getUsername().equals(username));
 		
 	}
@@ -84,7 +85,5 @@ class JournalBackendApplicationTests {
                 .andExpect(status().isBadRequest())
                 .andReturn();		
 		assertTrue(userRepository.findByUsername(username).isEmpty());
-		
 	}
-
 }
