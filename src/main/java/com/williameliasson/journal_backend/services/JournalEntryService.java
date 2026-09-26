@@ -6,6 +6,10 @@ import com.williameliasson.journal_backend.models.Mood;
 import com.williameliasson.journal_backend.models.User;
 import com.williameliasson.journal_backend.repositories.JournalEntryRepository;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -37,6 +41,11 @@ public class JournalEntryService {
         return journalEntryRepository.findAllByUser(user);
     }
 
+    public List<JournalEntry> getJournalEntriesByUserBetweenDates(User user, LocalDate fromDate, LocalDate toDate){
+        Instant from = fromDate.atStartOfDay(ZoneId.of("Europe/Stockholm")).toInstant();
+        Instant to = toDate.atStartOfDay(ZoneId.of("Europe/Stockholm")).toInstant();
+        return journalEntryRepository.findAllByUserAndCreatedAtBetween(user, from, to);
+    }
     
     // public List<JournalEntry> getAllJournalEntries(){
     //     return (List<JournalEntry>) journalEntryRepository.findAll();
