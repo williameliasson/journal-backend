@@ -6,6 +6,7 @@ import com.williameliasson.journal_backend.models.Mood;
 import com.williameliasson.journal_backend.models.User;
 import com.williameliasson.journal_backend.repositories.JournalEntryRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class JournalEntryService {
         return journalEntryRepository.findAllByUser(user);
     }
 
+    public List<JournalEntry> getJournalEntriesByUserBetweenDates(User user, LocalDate from, LocalDate to){
+        return journalEntryRepository.findAllByUserCreatedAtBetween(user, from, to);
+    }
     
     // public List<JournalEntry> getAllJournalEntries(){
     //     return (List<JournalEntry>) journalEntryRepository.findAll();
