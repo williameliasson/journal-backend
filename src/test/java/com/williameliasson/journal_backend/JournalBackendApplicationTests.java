@@ -12,6 +12,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -24,6 +25,7 @@ import com.williameliasson.journal_backend.models.User;
 import com.williameliasson.journal_backend.repositories.UserRepository;
 import com.williameliasson.journal_backend.services.AuthService;
 
+import jakarta.transaction.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -54,6 +56,7 @@ class JournalBackendApplicationTests {
 	}
 
 	@Test
+	@Transactional 
 	void userShouldBeCreated() throws Exception{
 		// create user using repository
 		String username = "Bob";
@@ -64,6 +67,23 @@ class JournalBackendApplicationTests {
                 .andExpect(status().isCreated())
                 .andReturn();		
 		assertTrue(userRepository.findByUsername(username).get().getUsername().equals(username));
+		
+	}
+	
+	@Test 
+	@Transactional 
+	void userShouldNotBeCreatedWhenPasswordsMismatch() throws Exception{
+		// create user using repository
+		String username = "Bob";
+		String password = "password";
+		String otherPassword = "otherpassword";
+		RegisterRequest registerRequest = new RegisterRequest(username, password, otherPassword);
+		MvcResult mvcResult = mockMvc.perform(post("/api/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest))) 
+                .andExpect(status().isBadRequest())
+                .andReturn();		
+		assertTrue(userRepository.findByUsername(username).isEmpty());
 		
 	}
 
