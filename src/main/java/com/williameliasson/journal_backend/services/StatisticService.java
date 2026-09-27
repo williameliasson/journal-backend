@@ -50,7 +50,12 @@ public class StatisticService {
 
         // convert each moodCount into percentages
         moodCounts.forEach((name, count ) -> {
-            moodStats.add( new MoodStat(name, (double) count/totalCount));
+            // default percentage is 0%, i.e. if it is 0 totalCount, we avoid the division by zero
+            double percentage = 0;
+            if (totalCount != 0){
+                percentage = (double) count/totalCount;
+            }
+            moodStats.add( new MoodStat(name, percentage));
         });
 
         StatisticsResponse statisticsResponse = new StatisticsResponse(username, moodStats, totalCount);
