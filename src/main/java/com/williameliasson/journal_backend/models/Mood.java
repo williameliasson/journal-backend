@@ -26,7 +26,11 @@ public class Mood {
     @Column (nullable = false, unique = true)
     private String name;
 
-    public Mood(String name){
+    @Column (nullable=false, length=1)
+    private String icon;
+
+    public Mood(String name, String icon){
         this.name = name;
+        this.icon = icon;
     }
 }

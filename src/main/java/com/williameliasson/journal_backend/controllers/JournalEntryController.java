@@ -47,7 +47,7 @@ public class JournalEntryController {
             List<JournalEntry> entries= journalEntryService.getJournalEntriesByUser(user);
             List<JournalEntryResponse> entryResponses = entries.stream()
                 .map(entry -> 
-                    new JournalEntryResponse(entry.getId(), user.getUsername(), entry.getTitle(), entry.getCreatedAt(), entry.getMood().getName())
+                    new JournalEntryResponse(entry.getId(), user.getUsername(), entry.getTitle(), entry.getCreatedAt(), entry.getMood().getName(), entry.getMood().getIcon())
                 ).toList();
             return ResponseEntity.status(HttpStatus.OK).body(entryResponses);
         } catch (IllegalArgumentException e){

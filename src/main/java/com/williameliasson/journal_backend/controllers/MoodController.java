@@ -45,7 +45,7 @@ public class MoodController {
     public List<MoodResponse> getAllMoods() {
         return moodService.getAllMoods().stream()
             .map(mood -> new MoodResponse(
-                mood.getId(), mood.getName()
+                mood.getId(), mood.getName(), mood.getIcon()
             )).toList();
     }
     
