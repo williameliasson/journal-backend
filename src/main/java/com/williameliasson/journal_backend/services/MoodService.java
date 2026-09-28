@@ -24,7 +24,7 @@ public class MoodService {
         if (moodNameExists(uppercaseName)) throw new IllegalArgumentException("Mood name already exists");
         
         // create object
-        Mood mood = new Mood(uppercaseName);
+        Mood mood = new Mood(uppercaseName, createMoodRequest.icon());
         moodRepository.save(mood);
     }
 
