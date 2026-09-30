@@ -54,15 +54,20 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public void login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {        
-        System.out.println(loginRequest.username());
-        System.out.println(loginRequest.password());
-        Authentication auth = authService.login(loginRequest);
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
+    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {        
         
-        context.setAuthentication(auth);
-        SecurityContextHolder.setContext(context);
-        securityContextRepository.saveContext(context, request, response);
+        try {
+            Authentication auth = authService.login(loginRequest);
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
+            securityContextRepository.saveContext(context, request, response);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
+        
     }
     
     @GetMapping("/me")
