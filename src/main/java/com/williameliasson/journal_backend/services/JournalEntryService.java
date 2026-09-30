@@ -43,7 +43,7 @@ public class JournalEntryService {
 
     public List<JournalEntry> getJournalEntriesByUserBetweenDates(User user, LocalDate fromDate, LocalDate toDate){
         Instant from = fromDate.atStartOfDay(ZoneId.of("Europe/Stockholm")).toInstant();
-        Instant to = toDate.atStartOfDay(ZoneId.of("Europe/Stockholm")).toInstant();
+        Instant to = toDate.plusDays(1).atStartOfDay(ZoneId.of("Europe/Stockholm")).toInstant();
         return journalEntryRepository.findAllByUserAndCreatedAtBetween(user, from, to);
     }
     
