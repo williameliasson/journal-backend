@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.williameliasson.journal_backend.dtos.LoginRequest;
 import com.williameliasson.journal_backend.dtos.RegisterRequest;
 import com.williameliasson.journal_backend.dtos.UserDTO;
+import com.williameliasson.journal_backend.exceptions.IncorrectCredentialsException;
+import com.williameliasson.journal_backend.exceptions.UsernameTakenException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,7 +41,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest request, HttpServletResponse response) {    
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest registerRequest, HttpServletRequest request, HttpServletResponse response) {    
         try {
             Authentication auth = authService.register(registerRequest);
             SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -48,13 +50,15 @@ public class AuthController {
             SecurityContextHolder.setContext(context);
             securityContextRepository.saveContext(context, request, response);
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (IllegalArgumentException e){
+        } catch (UsernameTakenException e){ 
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {        
+    public ResponseEntity<String> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {        
         
         try {
             Authentication auth = authService.login(loginRequest);
@@ -63,6 +67,8 @@ public class AuthController {
             context.setAuthentication(auth);
             SecurityContextHolder.setContext(context);
             securityContextRepository.saveContext(context, request, response);
+        } catch (IncorrectCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
         }
