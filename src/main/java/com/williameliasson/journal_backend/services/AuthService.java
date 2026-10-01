@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import com.williameliasson.journal_backend.dtos.LoginRequest;
 import com.williameliasson.journal_backend.dtos.RegisterRequest;
+import com.williameliasson.journal_backend.exceptions.IncorrectCredentialsException;
+import com.williameliasson.journal_backend.exceptions.UsernameTakenException;
 import com.williameliasson.journal_backend.models.User;
 
 @Service 
@@ -34,7 +36,7 @@ public class AuthService {
         }
         // check if username is taken
         Optional<User> existingUser = userRepository.findByUsername(registerRequest.username());
-        if (existingUser.isPresent()) throw new IllegalArgumentException("Username taken");
+        if (existingUser.isPresent()) throw new UsernameTakenException("Username taken");
         
         // save new user
         User user = new User();
@@ -47,12 +49,15 @@ public class AuthService {
     }
 
     public Authentication login(LoginRequest loginRequest){
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
-        );
+        try {
+            return authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.username(), loginRequest.password())
+            );
+        } catch (Exception e){
+            throw new IncorrectCredentialsException("Incorrect credentials");
+        }
 
         // SecurityContextHolder.getContext().setAuthentication(authentication);
-        return authentication;
     }
 
     public User getUserByUsername(String username){
