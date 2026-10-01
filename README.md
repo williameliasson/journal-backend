@@ -9,8 +9,20 @@ This is the backend of a project where you can log your mood over time and see a
 3. In the root of the project, run `docker compose up --build`. This will start the required docker containers (the spring boot and the postgres containers).
 4. The application should now be running at http://localhost:8080/
 
+## Architechture
+The general flow looks something like this:
+1. The user registers and logs into an account. The authentication is stored as a cookie in the users browser, which will be sent in each following request to the server.
+2. The user creates multiple JournalEntries, where they input some text and choose from a set of pre-made moods. (all users share the same available moods). The Entries are created by sending a form from the frontend to the backend, which validates it and checks authentication, and then saves it to the database.
+3. The user can now view their past entries as a timeline.
+4. The user can request a pie chart of their JournalEntries showing what percentage of them were tagged with what mood, during some specified range. Default range is the last 7 days, including today.
+
+## Design choices
+* I chose to make Mood an entity instead of an Enum. When I first laid out my plan for the project, my initial thought was to have each Mood be an Enum, like Mood.HAPPY etc. This would of course have worked as well. But I wanted to make a possible transition to have per-user moods easy, should the requirements ever change.
+* Using sessions instead of JWT for authentication was a decision I made simply because sessions work well for this kind of application, and because I believe JWT would be slightly overkill for this kind of project, and add unnecessary complexity.
+* I chose a relational database, Postgres, over having a document based one like MongoDB. It would also have worked to use MongoDB, but I find working with relational data to be easier, so I chose Postgres.
+
 ## Endpoints
-All endpoints of the API begin with /api/.
+All endpoints of the API begin with /api/. All endpoints except for those under Auth are required to be authenticated to access. The Auth paths are open because you need to be able to prove your identity while still not having proved it yet.
 ### Auth
 #### POST /register
 Takes a json body of this structure:
@@ -167,3 +179,5 @@ Returns a json body of this structure:
 * Spring Security
 * Postgres
 * Docker / Docker compose
+* JUnit
+* Testcontainers
