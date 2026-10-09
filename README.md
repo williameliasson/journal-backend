@@ -5,8 +5,8 @@ This is the backend of a project where you can log your mood over time and see a
 
 ## How to run
 1. Make sure Docker is running. [Get Docker](https://docs.docker.com/desktop/)
-2. Set env variables by copying the provided `.env.example` file into `.env`, and type your variables.
-3. In the root of the project, run `docker compose up --build`. This will start the required docker containers (the spring boot and the postgres containers).
+2. Set env variables by copying the provided `.env.example` file into `.env.dev`, and type your variables.
+3. In the root of the project, run `docker compose --env-file .env.dev up --build`. This will start the required docker containers (the spring boot and the postgres containers) for local development.
 4. The application should now be running at http://localhost:8080/
 
 ## Architechture

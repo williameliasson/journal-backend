@@ -2,6 +2,7 @@ package com.williameliasson.journal_backend.configs;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,9 @@ import com.williameliasson.journal_backend.services.CustomUserDetailsService;
 @Configuration 
 public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
+    
+    @Value("${FRONTEND_URL}")
+    private String frontendUrl;
 
     SecurityConfig(CustomUserDetailsService customUserDetailsService) {
         this.customUserDetailsService = customUserDetailsService;
@@ -32,7 +36,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http){
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/api/login", "/api/register", "/api/logout").permitAll()
                 .anyRequest().authenticated())
@@ -63,18 +67,18 @@ public class SecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
-    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("*"));
-    configuration.setAllowCredentials(true);
+        configuration.setAllowedOrigins(List.of(frontendUrl));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
 
-    UrlBasedCorsConfigurationSource source =
-        new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
 
-    source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration);
 
-    return source;
-}
+        return source;
+    }
 }
